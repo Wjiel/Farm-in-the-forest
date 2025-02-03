@@ -15,6 +15,7 @@ public class DayNight : MonoBehaviour
     [SerializeField] private float intensityNight = 1;
 
     public static Action startNightAction;
+    public static Action startDayAction;
     private void Start()
     {
         StartCoroutine(Timer());
@@ -38,5 +39,7 @@ public class DayNight : MonoBehaviour
     private void StartDay()
     {
         SunLight.DOIntensity(intensityDay, 10);
+
+        startDayAction?.Invoke();
     }
 }

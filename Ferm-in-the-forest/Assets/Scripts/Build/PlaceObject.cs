@@ -15,6 +15,16 @@ public class PlaceObject : MonoBehaviour
         _build = toPlace;
         _displayBuild = displayError;
     }
+    private void OnEnable()
+    {
+        DayNight.startNightAction += CanselBuild;
+    }
+
+    private void OnDisable()
+    {
+        DayNight.startNightAction -= CanselBuild;
+    }
+
     private void Start()
     {
         _cameraGame = Camera.main;
@@ -34,7 +44,11 @@ public class PlaceObject : MonoBehaviour
             ToPlace();
 
         if (Input.GetMouseButtonDown(1))
-            _build.DestroyBuild(gameObject);
+            CanselBuild();
+    }
+    private void CanselBuild()
+    {
+        _build.DestroyBuild(gameObject);
     }
     private void ToPlace()
     {
