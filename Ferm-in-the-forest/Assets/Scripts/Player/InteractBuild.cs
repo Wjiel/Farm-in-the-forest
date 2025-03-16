@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 /// <summary>
 /// класс который взаимодействует со всеми зданиями
 /// </summary>
@@ -13,16 +14,20 @@ public class InteractBuild : MonoBehaviour
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
-            _interact();
+            TryInteract();
     }
-    private void _interact()
+    private void TryInteract()
     {
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+        
         if (Physics.Raycast(ray, out RaycastHit hit, 100, layerBuild))
         {
-            if (hit.transform.TryGetComponent(out Interactable obj))
+            if (hit.transform.TryGetComponent(out Interactable interactable))
             {
-                obj.ToInteract();
+                interactable.ToInteract();
             }
         }
     }

@@ -10,7 +10,10 @@ public class Enemy : MonoBehaviour
     private int _currentHealth;
 
     private Transform _target;
-    private bool _isGround;
+    public void Init(Transform target)
+    {
+        _target = target;
+    }
     private void Start()
     {
         _agent = GetComponent<NavMeshAgent>();
@@ -18,40 +21,22 @@ public class Enemy : MonoBehaviour
         _currentHealth = MaxHealth;
         _agent.speed = MoveSpeed;
     }
-
-    private void Update()
+    private void FixedUpdate()
     {
-        if (_isGround == false)
-        {
-            _moveTranslate();
-        }
+        if (CanReachPosition(_target.position))
+            MoveNavMesh();
         else
-        {
-            if (CanReachPosition(_target.position))
-                _moveNavMesh();
-            else
-                _moveTranslate();
-        }
+            transform.position = Vector3.MoveTowards(transform.position, _target.position, MoveSpeed * Time.deltaTime);
     }
-    private bool CanReachPosition(Vector2 position)
+    private bool CanReachPosition(Vector3 position)
     {
-        NavMeshPath path = new NavMeshPath();
+        NavMeshPath path = new();
         _agent.CalculatePath(position, path);
         return path.status == NavMeshPathStatus.PathComplete;
     }
-    private void _moveTranslate()
-    {
-        transform.LookAt(_target);
-        transform.Translate(transform.forward * MoveSpeed * Time.deltaTime, Space.World);
-    }
-    private void _moveNavMesh()
+    private void MoveNavMesh()
     {
         _agent.SetDestination(_target.position);
-    }
-
-    public void Init(Transform target)
-    {
-        _target = target;
     }
     public void GetDamage(int damage)
     {
@@ -65,14 +50,5 @@ public class Enemy : MonoBehaviour
     private void Dead()
     {
         Destroy(gameObject);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.transform.CompareTag("Ground"))
-        {
-            _agent.enabled = true;
-            _isGround = true;
-        }
     }
 }

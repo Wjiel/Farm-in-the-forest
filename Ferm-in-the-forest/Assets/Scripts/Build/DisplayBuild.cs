@@ -2,49 +2,76 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// Класс для отображения ошибок в UI.
+/// </summary>
 public class DisplayErrorBuild : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI Display;
-    [SerializeField] private string error;
-    [SerializeField] private float TimeToReset;
-    private bool _isDisplay = false;
+    [SerializeField] private TextMeshProUGUI displayText;
+
+    [SerializeField] private string errorMessage = "Default Error";
+
+    // Время, через которое сообщение исчезнет
+    [SerializeField] private float resetTime = 3f;
+
+    private bool _isDisplaying = false;
+
     private float _currentTime;
-    private Coroutine coroutine;
+
+    private Coroutine _resetCoroutine;
+
+    /// <summary>
+    /// Отображает сообщение об ошибке.
+    /// </summary>
     public void DisplayError()
     {
-        if (_isDisplay)
-            return;
-
-        _isDisplay = true;
-
-        Display.text = error;
-
-        if (coroutine == null)
+        if (_isDisplaying)
         {
-            _currentTime = TimeToReset;
-            coroutine = StartCoroutine(resetVisible());
+            // Если сообщение уже отображается, просто обновляем таймер
+            ResetTimer();
+            return;
+        }
+
+        _isDisplaying = true;
+
+        displayText.text = errorMessage;
+
+        if (_resetCoroutine == null)
+        {
+            _currentTime = resetTime;
+            _resetCoroutine = StartCoroutine(ResetVisibility());
         }
         else
-            _currentTime = TimeToReset;
+        {
+            ResetTimer();
+        }
     }
 
-    private void _resetDisplay()
+    /// <summary>
+    /// Сбрасывает отображение ошибки.
+    /// </summary>
+    private void ResetDisplay()
     {
-        Display.text = null;
-
-        _isDisplay = false;
+        displayText.text = string.Empty; 
+        _isDisplaying = false;
+        _resetCoroutine = null; 
     }
 
-    private IEnumerator resetVisible()
+    /// <summary>
+    /// Корутина для постепенного сброса видимости.
+    /// </summary>
+    private IEnumerator ResetVisibility()
     {
         while (_currentTime > 0)
         {
             _currentTime -= Time.deltaTime;
-
-            yield return new WaitForFixedUpdate();
+            yield return null; 
         }
 
-        _resetDisplay();
-        coroutine = null;
+        ResetDisplay();
+    }
+    private void ResetTimer()
+    {
+        _currentTime = resetTime;
     }
 }

@@ -77,7 +77,6 @@ public class PlaceObject : MonoBehaviour
     }
     private void OnCollisionStay(Collision other)
     {
-
         if (renderers[0].material.color != Color.red)
         {
             _canBuild = false;
